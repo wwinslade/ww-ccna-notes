@@ -1,4 +1,4 @@
-# Routing Fundamentals
+# Routing Fundamentals and Static Routes
 Routes are stored in a routing table. A routing table is kin to a MAC table in a switch, except for IP packets instead of ether frames.
 
 Two main routing methods, dynamic and static.
@@ -58,6 +58,23 @@ Also called default route. A route to 0.0.0.0/0, includes all IP addresses betwe
 
 End hosts usually have no need for any more specific routes, they just need to know that in order to send packets outside of the local network, they have to send packets to the default gateway.
 
+Routers will attempt to any and all matching routes that are more specific than the default route. If there are none, then the router will forward the packet to the default gateway. This is often used to direct traffic to the internet.
+
+In a routing table, if the line `Gateway of last resort is not set`, this means that no default route has been configured. If no matching routes are in the routing table, then the packet will be dropped since there is no default route. To set a default route, use the following command:
+```
+ip route 0.0.0.0 0.0.0.0 203.0.113.2
+```
+This will result in the routing table looking something like below:
+```
+...
+Gateway of last resort is 203.0.113.2 to network 0.0.0.0
+
+S*	0.0.0.0/0 [1/0] via 203.0.113.2
+S	10.0.0.0/8 [1/0] via 192.168.12.2
+...
+```
+The `*` after the static route flag indicates that the route is a candidate for becoming the routers default route. There can be multiple of these, however, only one will be the active default gateway.
+
 ## Static Routing
 Local and Connected routes aren't sufficient to forward packets to networks that aren't hard wired to the router (remote networks). Enter static and dynamic routes.
 
@@ -91,6 +108,22 @@ An exit interface is a substitute for configuring a next hop. The router will th
 You may specify both an exit interface and a next hop. This is useful for configuring a route between two routers that are directly connected.
 `ip route <ip-address> <netmask> <exit-interface> <next-hop>`
 
-Left off at timestamp 25:30
+Behold, the following routing table:
+```
+S	192.168.1.0/24 is directly connected, GigabitEthernet0/0
+S	192.168.4.0/24 [1/0] via 192.168.24.4, GigabitEthernet0/1
+	192.168.12.0/24 is variably subnetted, 2 subnets, 2 masks
+C		192.168.12.0/24 is directly connected, GigabitEthernet0/0
+L		192.168.12.2/32 is directly connected, GigabitEthernet0/0
+```
+When you only specify an exit interface, the routing table shows the destination network as directly connected to that interface, even though this isn't the case. The first entry in the above routing table is an example of this, and resulted from calling `ip route 192.168.1.0 255.255.255.0 Gig0/0`. 
+It is important to note the distinction here. Despite displaying as directly connected, the subnet `192.168.1.0/24` is not directly connected to the router. Routes in which only an exit interface are specified rely on Proxy ARP to function.
+
+Specifying an exit interface, along with a next hop, yields the second line in the above routing table.
+
+Generally, specifying only an exit interface is not an issue, but it is best to generally specify both a next hop and an exit interface.
+
+
+
 
 
