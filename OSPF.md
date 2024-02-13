@@ -33,3 +33,5 @@ Note: Each LSA has an aging timer (30 mins by default). The LSA will be flooded 
  The scope of the CCNA only covers single area OSPF configuration.
 
  An **area** is a set of routers that contain the same LSDB
+
+Left off [here](https://youtu.be/pvuaoJ9YzoI?si=xtpSKoHlz9mb9bRq&t=715)
